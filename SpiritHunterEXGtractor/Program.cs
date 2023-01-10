@@ -12,6 +12,7 @@ namespace SpiritHunterEXGtractor
     {
         static void Main(string[] args)
         {
+            if(args.Length == 0) { Console.WriteLine("No arguments provided."); Console.ReadKey(); return; }
             BinaryReader br = new BinaryReader(new FileStream(args[0], FileMode.Open));
             if (ASCIIEncoding.ASCII.GetString(br.ReadBytes(3)) != "EXG") 
             {
