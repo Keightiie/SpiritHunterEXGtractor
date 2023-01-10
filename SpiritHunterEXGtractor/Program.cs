@@ -14,6 +14,9 @@ namespace SpiritHunterEXGtractor
         {
             if(args.Length == 0) { Console.WriteLine("No arguments provided."); Console.ReadKey(); return; }
             BinaryReader br = new BinaryReader(new FileStream(args[0], FileMode.Open));
+
+LOOP:
+            long imageStartPosition = br.BaseStream.Position;
             if (ASCIIEncoding.ASCII.GetString(br.ReadBytes(3)) != "EXG") 
             {
                 Console.WriteLine("Not a valid EXG file. Press any key to close.");
@@ -21,13 +24,14 @@ namespace SpiritHunterEXGtractor
                 return;
             };
 
-            br.BaseStream.Position = 0x10;
+
+            br.BaseStream.Position = imageStartPosition + 0x10;
             int Width = br.ReadUInt16();
             int Height = br.ReadUInt16();
             Console.WriteLine($"{Height} {Width}"); 
 
             Bitmap bmp = new Bitmap(Width, Height);
-            br.BaseStream.Position = 0x28;
+            br.BaseStream.Position = imageStartPosition + 0x28;
 
             for(int x = 0; x < Height; x++) 
             { 
@@ -43,11 +47,15 @@ namespace SpiritHunterEXGtractor
                 }
             
             }
-EXIT:
+
+            bmp.Save($"{args[0]}_{imageStartPosition}.png");
+            bmp.Dispose();
+
+            if (br.BaseStream.Position != br.BaseStream.Length) { goto LOOP; }
+
             br.Close();
 
-            bmp.Save($"{args[0]}.png");
-            bmp.Dispose();
+
 
         }
     }
